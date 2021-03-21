@@ -5,6 +5,14 @@ library(lubridate)
 library(ggrepel)
 
 # Loading the data found online 
+# Data was requested at http://ghdx.healthdata.org/gbd-2017/data-input-sources?page=65&components=6&risks=98
+# Tended to the supplementry material for the paper, there are subheadings called data sources. I followed the link,
+# on the link it appears that the 2015 data has been removed but 2017 is remaining. Go into the 2017 link. 
+# Then click on the link for Data Input Sources Tool. On that page, at the bottom click on the drop down arrow by components
+# and select "Risk factors". Under Locations leave as "Global" and under Risks type in "Tobacco"
+
+# OR the data could be found at 
+#  http://ghdx.healthdata.org/record/ihme-data/gbd-2015-smoking-prevalence-1980-2015
 Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
 
 # Exploring the dataset
