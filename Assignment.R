@@ -5,7 +5,7 @@ library(lubridate)
 library(ggrepel)
 
 # Loading the data found online 
-Smoking_prev <- read_csv("data/IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
+Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
 
 # Exploring the dataset
 summary(Smoking_prev)
@@ -82,3 +82,21 @@ ggplot(smok_prev_final_names, aes(male_change, female_change, colour = quadrant)
   annotate("text", label = "Female decrease\nmale decrease", x = -21, y = -15, size = 3.5, col = "lightskyblue1", fontface = 2) +
   annotate("text", label = "Female decrease\nmale increase", x = 7, y = -17, size = 3.5, col = "tomato2", fontface = 2) +
   annotate("text", label = "Female increase\nmale increase", x = 7, y = 7, size = 3.5, col = "darkred", fontface = 2)
+
+
+# Questions
+
+# What was the most challenging part of this exercise?
+# Working out how to calculate rate of change. By Obtaining more experience with the lag() function,
+# in order to perform a calculation between two different observations.
+
+# What took you the longest?
+#Figuring out which data were useful. The dataset had variables that didn't affect the plot, so selecting only useful columns took some time to figure out. 
+
+# What did you enjoy the most?
+# Creating the plot. I typed out the code for creating a ggplot without any hesitation and errors and saw that my plotted
+# points looked like those on the original figure. In truth, that was a very satisfying moment.
+
+# What did you enjoy the least?
+# Looking at the original data. It was quite daunting viewing the data at a glance, and the graph I 
+# had to recreate  with it. In hindsight, though, once I was able to systematically break down the assignment into steps, I found the task to be very simple.   
