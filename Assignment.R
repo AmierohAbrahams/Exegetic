@@ -6,7 +6,7 @@ library(ggrepel)
 
 # Loading the data found online 
 Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
-Smoking_prev <- IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05
+# Smoking_prev <- IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05
 
 # Exploring the dataset
 summary(Smoking_prev)
