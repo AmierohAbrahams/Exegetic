@@ -4,6 +4,9 @@ library(dplyr)
 library(lubridate)
 library(ggrepel)
 
+# The data could also be found at:
+#  - http://ghdx.healthdata.org/record/ihme-data/gbd-2015-smoking-prevalence-1980-2015
+
 # Loading the data found online 
 Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
 # Smoking_prev <- IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05
@@ -14,28 +17,24 @@ names(Smoking_prev)
 unique(Smoking_prev$location_name) #225 countries + 'Global' + 5 levels of 'SDI'
 unique(Smoking_prev$year_id)
 
-#age_group_id '22' == age_group "All Ages"
-#age_group_id '27' == age_group "Age-standardized"
-
 # Next Steps:
 # The dataset has means for every year (for both sexes),
 # Work out the PERCENTAGE-POINT rate of change over time (i.e. 1990 - 2015),
 # Plot the females change against the males, for every country 
 
-
 # Editing the dataset to only have the useful variables and observations
 smok_prev_comp <- Smoking_prev %>% 
   filter(age_group_id == 27, year_id %in% c(1990, 2015), metric == "Percent", sex != "Both") %>% 
-  select("location_name", "sex", "year_id", "mean")
-
+  select(2,4,7,10) %>% 
+  rename(avg = mean)
 
 #Separate the males and females, to calculate percentage change separately
 # then re-join them using location as common variable
 
 smoking_prev <- smok_prev_comp %>% 
   group_by(sex) %>% 
-  mutate(change = mean - lag(mean, default = first(mean))) %>% 
-  mutate(perc_change = change*100) %>%
+  mutate(change = avg - lag(avg, default = first(avg)),
+    perc_change = change * 100) %>%
   filter(year_id == 2015) %>% 
   select(location_name, perc_change) %>% 
   rename(change = perc_change)
@@ -48,11 +47,6 @@ smoking_prev_wide <- pivot_wider(smoking_prev,
                               Male < 0 & Female > 0 ~ "Q2",
                               Male < 0 & Female < 0 ~ "Q3",
                               Male > 0 & Female < 0 ~ "Q4"))
-
-# Now, create the list of country names that are displayed on the final plot
-# South Korea, Turkey, Belarus, Portugal, Greece, Bulgaria, Russia, Kuwait, Timor-Leste, 
-# Chile, Macedonia, Cyprus, Indonesia, Azerbijan, Montenegro, Saudi Arabia, Tonga, India, 
-# Japan, China, France, Britain, United States, Nepal, Brazil, Sweden, Canada, Norway, Iceland, Denmark
 
 smok_prev_final_names <- smoking_prev_wide %>% 
   mutate(label = if_else(location_name %in% c("South Korea", "Turkey", "Belarus", "Portugal", "Greece", "Bulgaria", 
