@@ -4,20 +4,14 @@ library(dplyr)
 library(lubridate)
 library(ggrepel)
 
-# The data could also be found at:
-#  - http://ghdx.healthdata.org/record/ihme-data/gbd-2015-smoking-prevalence-1980-2015
+# Downloading the data
 
-CSV_FILE = "IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV"
-URL_ZIP_FILE = file.path("http://ghdx.healthdata.org/sites/default/files/record-attached-files", CSV_FILE)
+temp <- tempfile()
+download.file("http://ghdx.healthdata.org/sites/default/files/record-attached-files/IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_1.zip", temp, mode = "wb")
+Smoking_prev <- read.csv(unz(temp,"IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV"))
+unlink(temp)
 
-if (!file.exists(CSV_FILE)) {
-  # Use download.file() to download zip archive.
-  # Use unzip() to unpack archive.
-}
-
-# Loading the data found online 
-    Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
-# Smoking_prev <- IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05
+Smoking_prev$location_name <- as.character(Smoking_prev$location_name)
 
 # Exploring the dataset
 summary(Smoking_prev)
@@ -62,6 +56,7 @@ smok_prev_final_names <- smoking_prev_wide %>%
                                               "Montenegro", "Saudi Arabia", "Tonga", "India", "Japan", "China", "France", "Britain", "United States",
                                               "Nepal", "Brazil", "Sweden", "Canada", "Norway", "Iceland", "Denmark"),"yes","no"))
 
+
 # Finally, create the plot
 Economist_Figure <- ggplot(smok_prev_final_names, aes(Male, Female, colour = quadrant)) +
   geom_point(size = 4, alpha = 0.8) + 
@@ -78,7 +73,7 @@ Economist_Figure <- ggplot(smok_prev_final_names, aes(Male, Female, colour = qua
   annotate("text", label = "Female decrease\nmale decrease", x = -21, y = -15, size = 3.5, col = "lightskyblue1", fontface = 2) +
   annotate("text", label = "Female decrease\nmale increase", x = 7, y = -17, size = 3.5, col = "tomato2", fontface = 2) +
   annotate("text", label = "Female increase\nmale increase", x = 7, y = 7, size = 3.5, col = "darkred", fontface = 2)
-
+Economist_Figure
 ggsave(filename = "Economist_Figure.jpg", plot = last_plot(), width=180, height = 150,units = "mm",dpi = 300, device = "jpg", path = "figures/")
 
 
