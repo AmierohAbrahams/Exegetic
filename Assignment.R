@@ -5,15 +5,8 @@ library(lubridate)
 library(ggrepel)
 
 # Loading the data found online 
-# Data was requested at http://ghdx.healthdata.org/gbd-2017/data-input-sources?page=65&components=6&risks=98
-# Tended to the supplementry material for the paper, there are subheadings called data sources. I followed the link,
-# on the link it appears that the 2015 data has been removed but 2017 is remaining. Go into the 2017 link. 
-# Then click on the link for Data Input Sources Tool. On that page, at the bottom click on the drop down arrow by components
-# and select "Risk factors". Under Locations leave as "Global" and under Risks type in "Tobacco"
-
-# OR the data could be found at 
-#  http://ghdx.healthdata.org/record/ihme-data/gbd-2015-smoking-prevalence-1980-2015
 Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
+Smoking_prev <- IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05
 
 # Exploring the dataset
 summary(Smoking_prev)
@@ -38,44 +31,37 @@ smok_prev_comp <- Smoking_prev %>%
 
 #Separate the males and females, to calculate percentage change separately
 # then re-join them using location as common variable
-smok_prev_males <- smok_prev_comp %>% 
-  filter(sex == "Male") %>% 
+
+smoking_prev <- smok_prev_comp %>% 
+  group_by(sex) %>% 
   mutate(change = mean - lag(mean, default = first(mean))) %>% 
   mutate(perc_change = change*100) %>%
   filter(year_id == 2015) %>% 
   select(location_name, perc_change) %>% 
-  rename(male_change = perc_change)
-  
-smok_prev_females <- smok_prev_comp %>% 
-  filter(sex == "Female") %>% 
-  mutate(change = mean - lag(mean, default = first(mean))) %>%
-  mutate(perc_change = change*100) %>% 
-  filter(year_id == 2015) %>% 
-  select(location_name, perc_change) %>% 
-  rename(female_change = perc_change)
+  rename(change = perc_change)
 
-
-# Rejoin our datasets and work out which quadrant each observation falls in
-smok_prev_final <- left_join(smok_prev_males, smok_prev_females) %>% 
-  mutate(quadrant = case_when(male_change > 0 & female_change > 0 ~ "Q1",
-                              male_change < 0 & female_change > 0 ~ "Q2",
-                              male_change < 0 & female_change < 0 ~ "Q3",
-                              male_change > 0 & female_change < 0 ~ "Q4"))
-
+smoking_prev_wide <- pivot_wider(smoking_prev, 
+                               id_cols = location_name, 
+                               names_from = sex, values_from = change,
+                               values_fn = mean)  %>% 
+  mutate(quadrant = case_when(Male > 0 & Female > 0 ~ "Q1",
+                              Male < 0 & Female > 0 ~ "Q2",
+                              Male < 0 & Female < 0 ~ "Q3",
+                              Male > 0 & Female < 0 ~ "Q4"))
 
 # Now, create the list of country names that are displayed on the final plot
 # South Korea, Turkey, Belarus, Portugal, Greece, Bulgaria, Russia, Kuwait, Timor-Leste, 
 # Chile, Macedonia, Cyprus, Indonesia, Azerbijan, Montenegro, Saudi Arabia, Tonga, India, 
 # Japan, China, France, Britain, United States, Nepal, Brazil, Sweden, Canada, Norway, Iceland, Denmark
 
-smok_prev_final_names <- smok_prev_final %>% 
+smok_prev_final_names <- smoking_prev_wide %>% 
   mutate(label = if_else(location_name %in% c("South Korea", "Turkey", "Belarus", "Portugal", "Greece", "Bulgaria", 
-                                              "Russia", "Kuwait", "Timor-Leste", "Chile", "Macedonia", "Cyprus", "Indonesia", "Azerbijan",
+                                              "Russia", "Kuwait", "Timor-Leste", "Chile", "Macedonia", "Cyprus", "Indonesia", "Azerbaijan",
                                               "Montenegro", "Saudi Arabia", "Tonga", "India", "Japan", "China", "France", "Britain", "United States",
                                               "Nepal", "Brazil", "Sweden", "Canada", "Norway", "Iceland", "Denmark"),"yes","no"))
 
 # Finally, create the plot
-ggplot(smok_prev_final_names, aes(male_change, female_change, colour = quadrant)) +
+Economist_Figure <- ggplot(smok_prev_final_names, aes(Male, Female, colour = quadrant)) +
   geom_point(size = 4, alpha = 0.8) + 
   scale_color_manual(values = c("darkred", "steelblue3", "lightskyblue1", "tomato2")) + 
   geom_hline(yintercept = 0, size = 0.7) +
@@ -90,6 +76,8 @@ ggplot(smok_prev_final_names, aes(male_change, female_change, colour = quadrant)
   annotate("text", label = "Female decrease\nmale decrease", x = -21, y = -15, size = 3.5, col = "lightskyblue1", fontface = 2) +
   annotate("text", label = "Female decrease\nmale increase", x = 7, y = -17, size = 3.5, col = "tomato2", fontface = 2) +
   annotate("text", label = "Female increase\nmale increase", x = 7, y = 7, size = 3.5, col = "darkred", fontface = 2)
+
+ggsave(filename = "Economist_Figure.jpg", plot = last_plot(), width=180, height = 150,units = "mm",dpi = 300, device = "jpg", path = "figures/")
 
 
 # Questions
@@ -107,4 +95,5 @@ ggplot(smok_prev_final_names, aes(male_change, female_change, colour = quadrant)
 
 # What did you enjoy the least?
 # Looking at the original data. It was quite daunting viewing the data at a glance, and the graph I 
-# had to recreate  with it. In hindsight, though, once I was able to systematically break down the assignment into steps, I found the task to be very simple.   
+# had to recreate  with it. In hindsight, though, once I was able to systematically break down the assignment into steps, I found the task to be very simple. 
+
