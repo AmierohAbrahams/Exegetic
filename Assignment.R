@@ -7,8 +7,16 @@ library(ggrepel)
 # The data could also be found at:
 #  - http://ghdx.healthdata.org/record/ihme-data/gbd-2015-smoking-prevalence-1980-2015
 
+CSV_FILE = "IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV"
+URL_ZIP_FILE = file.path("http://ghdx.healthdata.org/sites/default/files/record-attached-files", CSV_FILE)
+
+if (!file.exists(CSV_FILE)) {
+  # Use download.file() to download zip archive.
+  # Use unzip() to unpack archive.
+}
+
 # Loading the data found online 
-Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
+    Smoking_prev <- read_csv("IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05.CSV")
 # Smoking_prev <- IHME_GBD_2015_SMOKING_PREVALENCE_1980_2015_Y2017M04D05
 
 # Exploring the dataset
